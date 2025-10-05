@@ -17,7 +17,7 @@ export default function Home() {
       <View style={styles.card}>
         <Text style={styles.cardTitulo}>Projeto Avaliativo de Cálculo Numérico</Text>
         <Text style={styles.cardTexto}>Docente: Jorge Cavalcanti</Text>
-        <Text style={styles.cardTexto}>Discentes: Adhemar Cavalcanti, Maria Nicolle, Stharley</Text>
+        <Text style={styles.cardTexto}>Discentes: Adhemar Cavalcanti, Maria Nicolle, Stharley Santos</Text>
       </View>
     </View>
   );
