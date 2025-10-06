@@ -1,15 +1,15 @@
 import Decimal from "decimal.js";
 import React, { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleProp,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-    ViewStyle
+  Alert,
+  ScrollView,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from "react-native";
 
 // Precisão global
@@ -35,7 +35,7 @@ const operacoes: Record<OperacaoTipo, (x: Decimal, y: Decimal) => Decimal> = {
   "+": (x, y) => x.plus(y),
   "-": (x, y) => x.minus(y),
   "*": (x, y) => x.times(y),
-  "/": (x, y) => y.equals(0) ? new Decimal(Infinity) : x.div(y),
+  "/": (x, y) => (y.equals(0) ? new Decimal(Infinity) : x.div(y)),
 };
 
 // Operação única
@@ -44,13 +44,13 @@ function calcularOperacaoUnica(
   yTxt: string,
   operacao: OperacaoTipo,
   numDigitos: number,
-  metodo: "truncamento" | "arredondamento"
+  metodo: "Truncamento" | "Arredondamento"
 ) {
   const x = new Decimal(xTxt);
   const y = new Decimal(yTxt);
   const valorExato = operacoes[operacao](x, y);
 
-  const funcaoAjuste = metodo === "truncamento" ? truncar : arredondar;
+  const funcaoAjuste = metodo === "Truncamento" ? truncar : arredondar;
   const xAprox = funcaoAjuste(x, numDigitos);
   const yAprox = funcaoAjuste(y, numDigitos);
   const resultadoParcial = operacoes[operacao](xAprox, yAprox);
@@ -59,7 +59,7 @@ function calcularOperacaoUnica(
   const erroAbs = valorExato.minus(valorAproximado).abs();
   const erroRel = valorExato.equals(0)
     ? new Decimal(0)
-    : erroAbs.div(valorExato).abs();
+    : erroAbs.div(valorAproximado).abs();
 
   return { xAprox, yAprox, valorExato, valorAproximado, erroAbs, erroRel };
 }
@@ -69,10 +69,10 @@ function simularSomasSequenciais(
   numeroTxt: string,
   totalSomas: number,
   numDigitos: number,
-  metodo: "truncamento" | "arredondamento"
+  metodo: "Truncamento" | "Arredondamento"
 ) {
   const numero = new Decimal(numeroTxt);
-  const funcaoAjuste = metodo === "truncamento" ? truncar : arredondar;
+  const funcaoAjuste = metodo === "Truncamento" ? truncar : arredondar;
 
   const valorExatoFinal = numero.times(totalSomas);
   let somaAcumulada = new Decimal(0);
@@ -86,15 +86,23 @@ function simularSomasSequenciais(
   const erroAbs = valorExatoFinal.minus(valorAproximadoFinal).abs();
   const erroRel = valorExatoFinal.equals(0)
     ? new Decimal(0)
-    : erroAbs.div(valorExatoFinal).abs();
+    : erroAbs.div(valorAproximadoFinal).abs();
 
-  return { valorExatoFinal, valorAproximadoFinal, erroAbs, erroRel, passos, numeroAjustado: funcaoAjuste(numero, numDigitos) };
+  return {
+    valorExatoFinal,
+    valorAproximadoFinal,
+    erroAbs,
+    erroRel,
+    passos,
+    numeroAjustado: funcaoAjuste(numero, numDigitos),
+  };
 }
 
 // Notação científica igual ao Python
 function formatCientificaBonita(valor?: Decimal, numDigitos?: number): string {
   if (!valor || valor.isZero()) return "0";
-  const dig = typeof numDigitos === "number" && numDigitos > 0 ? numDigitos - 1 : 4;
+  const dig =
+    typeof numDigitos === "number" && numDigitos > 0 ? numDigitos - 1 : 4;
   return valor.toExponential(dig);
 }
 
@@ -106,7 +114,9 @@ export default function App() {
   const [totalSomas, setTotalSomas] = useState("");
   const [numDigitos, setNumDigitos] = useState("");
   const [operacao, setOperacao] = useState<OperacaoTipo>("+");
-  const [metodo, setMetodo] = useState<"truncamento" | "arredondamento">("truncamento");
+  const [metodo, setMetodo] = useState<"Truncamento" | "Arredondamento">(
+    "Truncamento"
+  );
   const [resultado, setResultado] = useState<any>(null);
 
   const substituirVirgula = (text: string) => text.replace(",", ".");
@@ -125,7 +135,10 @@ export default function App() {
         setResultado(res);
       }
     } catch (e) {
-      Alert.alert("Erro", "Verifique os números digitados. Use ponto (.) como separador decimal.");
+      Alert.alert(
+        "Erro",
+        "Verifique os números digitados. Use ponto (.) como separador decimal."
+      );
     }
   };
 
@@ -136,7 +149,7 @@ export default function App() {
 
   const botaoEstilo = (ativo: boolean): StyleProp<ViewStyle> => ({
     flex: 1,
-    padding: 14,
+    padding: 10,
     marginHorizontal: 4,
     borderRadius: 10,
     backgroundColor: ativo ? "#1e90ff" : "#a0a0a0",
@@ -154,10 +167,18 @@ export default function App() {
         <Text style={styles.titulo}>Simulador de Erros Numéricos</Text>
 
         <View style={styles.switchContainer}>
-          <TouchableOpacity activeOpacity={0.7} style={botaoEstilo(modo === "1")} onPress={() => trocarModo("1")}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={botaoEstilo(modo === "1")}
+            onPress={() => trocarModo("1")}
+          >
             <Text style={styles.botaoTexto}>Operação Única</Text>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.7} style={botaoEstilo(modo === "2")} onPress={() => trocarModo("2")}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={botaoEstilo(modo === "2")}
+            onPress={() => trocarModo("2")}
+          >
             <Text style={styles.botaoTexto}>Somas Sequenciais</Text>
           </TouchableOpacity>
         </View>
@@ -168,21 +189,26 @@ export default function App() {
             <TextInput
               style={styles.input}
               value={x}
-              onChangeText={t => setX(substituirVirgula(t))}
+              onChangeText={(t) => setX(substituirVirgula(t))}
               keyboardType="decimal-pad"
             />
             <Text style={styles.label}>Número Y:</Text>
             <TextInput
               style={styles.input}
               value={y}
-              onChangeText={t => setY(substituirVirgula(t))}
+              onChangeText={(t) => setY(substituirVirgula(t))}
               keyboardType="decimal-pad"
             />
 
             <Text style={styles.label}>Operação:</Text>
             <View style={styles.switchContainer}>
-              {["+","-","*","/"].map(op => (
-                <TouchableOpacity key={op} activeOpacity={0.7} style={botaoEstilo(operacao===op)} onPress={()=>setOperacao(op as OperacaoTipo)}>
+              {["+", "-", "*", "/"].map((op) => (
+                <TouchableOpacity
+                  key={op}
+                  activeOpacity={0.7}
+                  style={botaoEstilo(operacao === op)}
+                  onPress={() => setOperacao(op as OperacaoTipo)}
+                >
                   <Text style={styles.botaoTexto}>{op}</Text>
                 </TouchableOpacity>
               ))}
@@ -190,8 +216,15 @@ export default function App() {
 
             <Text style={styles.label}>Método:</Text>
             <View style={styles.switchContainer}>
-              {["truncamento","arredondamento"].map(m => (
-                <TouchableOpacity key={m} activeOpacity={0.7} style={botaoEstilo(metodo===m)} onPress={()=>setMetodo(m as "truncamento"|"arredondamento")}>
+              {["Truncamento", "Arredondamento"].map((m) => (
+                <TouchableOpacity
+                  key={m}
+                  activeOpacity={0.7}
+                  style={botaoEstilo(metodo === m)}
+                  onPress={() =>
+                    setMetodo(m as "Truncamento" | "Arredondamento")
+                  }
+                >
                   <Text style={styles.botaoTexto}>{m}</Text>
                 </TouchableOpacity>
               ))}
@@ -211,7 +244,7 @@ export default function App() {
             <TextInput
               style={styles.input}
               value={numero}
-              onChangeText={t=>setNumero(substituirVirgula(t))}
+              onChangeText={(t) => setNumero(substituirVirgula(t))}
               keyboardType="decimal-pad"
             />
             <Text style={styles.label}>Total de somas:</Text>
@@ -230,8 +263,15 @@ export default function App() {
             />
             <Text style={styles.label}>Método:</Text>
             <View style={styles.switchContainer}>
-              {["truncamento","arredondamento"].map(m => (
-                <TouchableOpacity key={m} activeOpacity={0.7} style={botaoEstilo(metodo===m)} onPress={()=>setMetodo(m as "truncamento"|"arredondamento")}>
+              {["Truncamento", "Arredondamento"].map((m) => (
+                <TouchableOpacity
+                  key={m}
+                  activeOpacity={0.7}
+                  style={botaoEstilo(metodo === m)}
+                  onPress={() =>
+                    setMetodo(m as "Truncamento" | "Arredondamento")
+                  }
+                >
                   <Text style={styles.botaoTexto}>{m}</Text>
                 </TouchableOpacity>
               ))}
@@ -239,26 +279,42 @@ export default function App() {
           </View>
         )}
 
-        <TouchableOpacity activeOpacity={0.8} style={styles.botaoCalcular} onPress={calcular}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.botaoCalcular}
+          onPress={calcular}
+        >
           <Text style={styles.botaoTexto}>Calcular</Text>
         </TouchableOpacity>
 
         {/* Resultados Operação Única */}
         {resultado && modo === "1" && (
           <View style={styles.resultado}>
-            <Text style={{fontWeight:'bold', marginBottom:8}}>--- Resultados da Operação Única ---</Text>
+            <Text style={{ fontWeight: "bold", marginBottom: 8 }}>
+              --- Resultados da Operação Única ---
+            </Text>
             <Text>Valor Exato: {resultado.valorExato.toString()}</Text>
-            <Text>Valor Aproximado: {resultado.valorAproximado.toString()}</Text>
             <Text>
-              (Notação Científica: {formatCientificaBonita(resultado.valorAproximado, parseInt(numDigitos))})
+              Valor Aproximado: {resultado.valorAproximado.toString()}
+            </Text>
+            <Text>
+              (Notação Científica:{" "}
+              {formatCientificaBonita(
+                resultado.valorAproximado,
+                parseInt(numDigitos)
+              )}
+              )
             </Text>
             <Text>Erro Absoluto: {resultado.erroAbs.toString()}</Text>
             <Text>
-              (Notação Científica: {formatCientificaBonita(resultado.erroAbs, parseInt(numDigitos))})
+              (Notação Científica:{" "}
+              {formatCientificaBonita(resultado.erroAbs, parseInt(numDigitos))})
             </Text>
-            <Text>Erro Relativo: {(resultado.erroRel.toNumber() * 100).toFixed(4)}%</Text>
-            <View style={{marginTop:8}}>
-              <Text style={{fontWeight:'bold'}}>Valores Ajustados:</Text>
+            <Text>
+              Erro Relativo: {(resultado.erroRel.toNumber() * 100).toFixed(4)}%
+            </Text>
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ fontWeight: "bold" }}>Valores Ajustados:</Text>
               <Text>X ajustado: {resultado.xAprox.toString()}</Text>
               <Text>Y ajustado: {resultado.yAprox.toString()}</Text>
             </View>
@@ -268,25 +324,49 @@ export default function App() {
         {/* Resultados Somas Sequenciais */}
         {resultado && modo === "2" && (
           <View style={styles.resultado}>
-            <Text style={{fontWeight:'bold', marginBottom:8}}>--- Resultados das Somas Sequenciais ---</Text>
-            <Text>Valor Exato Final: {resultado.valorExatoFinal.toString()}</Text>
-            <Text>Valor Aproximado Final: {resultado.valorAproximadoFinal.toString()}</Text>
+            <Text style={{ fontWeight: "bold", marginBottom: 8 }}>
+              --- Resultados das Somas Sequenciais ---
+            </Text>
             <Text>
-              (Notação Cientifica: {formatCientificaBonita(resultado.valorAproximadoFinal, parseInt(numDigitos))})
+              Valor Exato Final: {resultado.valorExatoFinal.toString()}
+            </Text>
+            <Text>
+              Valor Aproximado Final:{" "}
+              {resultado.valorAproximadoFinal.toString()}
+            </Text>
+            <Text>
+              (Notação Cientifica:{" "}
+              {formatCientificaBonita(
+                resultado.valorAproximadoFinal,
+                parseInt(numDigitos)
+              )}
+              )
             </Text>
             <Text>Erro Absoluto Final: {resultado.erroAbs.toString()}</Text>
             <Text>
-              (Notação Cientifica: {formatCientificaBonita(resultado.erroAbs, parseInt(numDigitos))})
+              (Notação Cientifica:{" "}
+              {formatCientificaBonita(resultado.erroAbs, parseInt(numDigitos))})
             </Text>
-            <Text>Erro Relativo Final: {(resultado.erroRel.toNumber() * 100).toFixed(4)}%</Text>
-            <View style={{marginTop:8}}>
-              <Text style={{fontWeight:'bold'}}>Passos da soma:</Text>
+            <Text>
+              Erro Relativo Final:{" "}
+              {(resultado.erroRel.toNumber() * 100).toFixed(4)}%
+            </Text>
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ fontWeight: "bold" }}>Passos da soma:</Text>
               {resultado.passos.map((p: Decimal, i: number) => (
-                <Text key={i}>{`Soma ${i+1}: ${p.toString()} (Notação Cientifica: ${formatCientificaBonita(p, parseInt(numDigitos))})`}</Text>
+                <Text key={i}>{`Soma ${
+                  i + 1
+                }: ${p.toString()} (Notação Cientifica: ${formatCientificaBonita(
+                  p,
+                  parseInt(numDigitos)
+                )})`}</Text>
               ))}
             </View>
-            <View style={{marginTop:8}}>
-              <Text style={{fontWeight:'bold'}}>Número ajustado a cada soma: {resultado.numeroAjustado.toString()}</Text>
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ fontWeight: "bold" }}>
+                Número ajustado a cada soma:{" "}
+                {resultado.numeroAjustado.toString()}
+              </Text>
             </View>
           </View>
         )}
@@ -297,12 +377,60 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: { padding: 16 },
-  titulo: { fontSize: 28, fontWeight: "bold", marginBottom: 16, textAlign: "center", color: "#1e3d59" },
-  card: { padding: 16, backgroundColor: "#fff", borderRadius: 12, marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, elevation: 4 },
+  titulo: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
+    color: "#1e3d59",
+  },
+  card: {
+    padding: 16,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+  },
   label: { fontWeight: "bold", marginTop: 8, marginBottom: 4, color: "#333" },
-  input: { borderWidth: 1, borderColor: "#bbb", borderRadius: 8, padding: 10, marginBottom: 8, backgroundColor: "#f9f9f9" },
-  switchContainer: { flexDirection: "row", justifyContent: "space-around", marginVertical: 8 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#bbb",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 8,
+    backgroundColor: "#f9f9f9",
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: 8,
+  },
   botaoTexto: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  botaoCalcular: { backgroundColor: "#4CAF50", padding: 16, borderRadius: 12, marginTop: 12, alignItems: "center", shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, elevation: 4 },
-  resultado: { marginTop: 16, padding: 16, backgroundColor: "#fff", borderRadius: 12, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, elevation: 3 }
+  botaoCalcular: {
+    backgroundColor: "#4CAF50",
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 12,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+  },
+  resultado: {
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
 });
