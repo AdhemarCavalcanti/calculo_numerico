@@ -1,8 +1,0 @@
-id,nome,cpf,nascimento,email,cidade,bairro,created_at,estado,auth_uid,sexo,apelido
-83,Fabiany,64649797676,1971-05-24,fabiany2000@hotmail.com,João Pessoa,Madalena,2025-09-01 23:58:28.738488+00,PB,9df2dc30-5264-49e4-b250-78236756832e,masculino,Faby
-84,Hebert,55458885666,2003-09-16,hebert.hb.brito@gmail.com,João Pessoa,João Pessoa,2025-09-05 19:26:18.92728+00,PB,a0bb6f8a-88ce-4056-97c4-928eb9f79590,masculino,Hebert
-89,Panda,66666669999,1999-09-09,tialbuquerque@gmail.com,Recife,Jaqueira,2025-09-10 21:37:31.893302+00,PE,72a919a7-2134-4953-94b2-26347e2f19d0,masculino,Panda
-99,Vinicius Aroni,07986941499,1992-09-05,viniciusaroni.melo@gmail.com,João Pessoa,"Bancarios ",2025-09-25 00:39:58.32207+00,PB,479f30dd-64b2-48c9-94c2-bb747f56b56e,masculino,"Gostosão "
-102,Íris Vlad,36666666666,1990-12-31,iris@hotmailm.com,João Pessoa,Banca,2025-09-26 04:41:12.539649+00,PB,8464ddb9-489e-4617-96f1-79ad7e650aa8,feminino,Izinha
-103,Gianna Guedes,10136772420,1991-07-23,gianna.guedes@outlook.com,João Pessoa,Manaira,2025-10-03 20:51:53.441868+00,PB,3d6e5f44-cf95-4a2d-8a72-a198df965ad4,feminino,Gih
-122,Adhemar Cavalcanti,08473193423,1993-12-31,adhemar2000neto@hotmail.ckm,João Pessoa,Madalena,2025-10-06 17:15:44.396144+00,PB,26aad8b1-0ea4-486e-bb79-888d28cb5479,masculino,Adhesea

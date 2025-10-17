@@ -15,18 +15,21 @@ import {
 // Precisão global
 Decimal.set({ precision: 50 });
 
-// Truncar/arredondar conforme Python
-function truncar(numero: Decimal, numDigitos: number): Decimal {
+// Ajuste por dígitos significativos
+function ajustarDigitos(numero: Decimal, numDigitos: number, modo: Decimal.Rounding) {
   if (numero.isZero()) return new Decimal(0);
   const expoente = numero.e;
-  const casasDecimais = numDigitos - expoente - 1;
-  return numero.toDecimalPlaces(casasDecimais, Decimal.ROUND_DOWN);
+  const fator = new Decimal(10).pow(expoente - numDigitos + 1);
+  return numero.div(fator).toDecimalPlaces(0, modo).times(fator);
 }
+
+// Funções de truncamento e arredondamento
+function truncar(numero: Decimal, numDigitos: number): Decimal {
+  return ajustarDigitos(numero, numDigitos, Decimal.ROUND_DOWN);
+}
+
 function arredondar(numero: Decimal, numDigitos: number): Decimal {
-  if (numero.isZero()) return new Decimal(0);
-  const expoente = numero.e;
-  const casasDecimais = numDigitos - expoente - 1;
-  return numero.toDecimalPlaces(casasDecimais, Decimal.ROUND_HALF_UP);
+  return ajustarDigitos(numero, numDigitos, Decimal.ROUND_HALF_UP);
 }
 
 // Operações
@@ -221,9 +224,7 @@ export default function App() {
                   key={m}
                   activeOpacity={0.7}
                   style={botaoEstilo(metodo === m)}
-                  onPress={() =>
-                    setMetodo(m as "Truncamento" | "Arredondamento")
-                  }
+                  onPress={() => setMetodo(m as "Truncamento" | "Arredondamento")}
                 >
                   <Text style={styles.botaoTexto}>{m}</Text>
                 </TouchableOpacity>
@@ -268,9 +269,7 @@ export default function App() {
                   key={m}
                   activeOpacity={0.7}
                   style={botaoEstilo(metodo === m)}
-                  onPress={() =>
-                    setMetodo(m as "Truncamento" | "Arredondamento")
-                  }
+                  onPress={() => setMetodo(m as "Truncamento" | "Arredondamento")}
                 >
                   <Text style={styles.botaoTexto}>{m}</Text>
                 </TouchableOpacity>
@@ -287,16 +286,14 @@ export default function App() {
           <Text style={styles.botaoTexto}>Calcular</Text>
         </TouchableOpacity>
 
-        {/* Resultados Operação Única */}
+        {/* Resultados */}
         {resultado && modo === "1" && (
           <View style={styles.resultado}>
             <Text style={{ fontWeight: "bold", marginBottom: 8 }}>
               --- Resultados da Operação Única ---
             </Text>
             <Text>Valor Exato: {resultado.valorExato.toString()}</Text>
-            <Text>
-              Valor Aproximado: {resultado.valorAproximado.toString()}
-            </Text>
+            <Text>Valor Aproximado: {resultado.valorAproximado.toString()}</Text>
             <Text>
               (Notação Científica:{" "}
               {formatCientificaBonita(
@@ -321,7 +318,6 @@ export default function App() {
           </View>
         )}
 
-        {/* Resultados Somas Sequenciais */}
         {resultado && modo === "2" && (
           <View style={styles.resultado}>
             <Text style={{ fontWeight: "bold", marginBottom: 8 }}>
@@ -335,7 +331,7 @@ export default function App() {
               {resultado.valorAproximadoFinal.toString()}
             </Text>
             <Text>
-              (Notação Cientifica:{" "}
+              (Notação Científica:{" "}
               {formatCientificaBonita(
                 resultado.valorAproximadoFinal,
                 parseInt(numDigitos)
@@ -344,7 +340,7 @@ export default function App() {
             </Text>
             <Text>Erro Absoluto Final: {resultado.erroAbs.toString()}</Text>
             <Text>
-              (Notação Cientifica:{" "}
+              (Notação Científica:{" "}
               {formatCientificaBonita(resultado.erroAbs, parseInt(numDigitos))})
             </Text>
             <Text>
@@ -356,7 +352,7 @@ export default function App() {
               {resultado.passos.map((p: Decimal, i: number) => (
                 <Text key={i}>{`Soma ${
                   i + 1
-                }: ${p.toString()} (Notação Cientifica: ${formatCientificaBonita(
+                }: ${p.toString()} (Notação Científica: ${formatCientificaBonita(
                   p,
                   parseInt(numDigitos)
                 )})`}</Text>
@@ -364,8 +360,7 @@ export default function App() {
             </View>
             <View style={{ marginTop: 8 }}>
               <Text style={{ fontWeight: "bold" }}>
-                Número ajustado a cada soma:{" "}
-                {resultado.numeroAjustado.toString()}
+                Número ajustado a cada soma: {resultado.numeroAjustado.toString()}
               </Text>
             </View>
           </View>
